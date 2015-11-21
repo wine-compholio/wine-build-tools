@@ -54,7 +54,7 @@ function update_bzr {
 
 		# Only the changelog changed, check if only the timestamp changed
 		lines_changed=$(cd "$dir"; bzr diff --context=0 | grep -v "\(^=== \|^--- \|^+++ \|^@@ \)" ; true)
-		lines_changed=$(echo "$lines_changed" | grep -v -E '^[+|-] -- [A-Za-z]+ [A-Za-z]+ <[^>]+> [ ]* [A-Za-z]+, [0-9]+ [A-Za-z]+ [0-9]+ [0-9]{2}:[0-9]{2}:[0-9]{2} [+|-][0-9]{4}'; true)
+		lines_changed=$(echo "$lines_changed" | grep -v -E '^[+|-] -- .* <[^>]+>  [A-Za-z]+, [0-9]+ [A-Za-z]+ [0-9]+ [0-9]{2}:[0-9]{2}:[0-9]{2} [+-][0-9]{4}'; true)
 
 		if [ -z "$lines_changed" ]; then
 			echo "No changes for $distro"
