@@ -3,6 +3,7 @@
 # Script to push changes to launchpad
 #
 # Copyright (C) 2015 Michael Müller
+# Copyright (C) 2015 Sebastian Lackner
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -20,7 +21,18 @@
 #
 set -eu
 
-function update_bzr {
+usage()
+{
+	echo ""
+	echo "Usage: launchpad-update.sh --ver VERSION [--rel REL]"
+	echo ""
+	echo "  --ver VERSION               update bzr branches for wine version VERSION"
+	echo "  --rel REL                   update bzr branches for debian-version REL"
+	echo ""
+}
+
+update_bzr()
+{
 	dir="$1"
 	url="$2"
 	ver="$3"
@@ -74,31 +86,13 @@ function update_bzr {
 	return 0
 }
 
-function update_all {
-	ver="$1"
-	rel="$2"
-
-	if [ ! -d launchpad ]; then
-		mkdir launchpad
-	fi
-
-	update_bzr launchpad/wine-build-development \
-		"lp:~wine/wine/build-development" "$ver" "$rel" "ubuntu-any-development"
-	update_bzr launchpad/wine-build-staging \
-		"lp:~wine/wine/build-staging" "$ver" "$rel" "ubuntu-any-staging"
-}
-
-function usage {
-	echo ""
-	echo "Usage: launchpad-update.sh --ver VERSION [--rel REL]"
-	echo ""
-	echo "  --ver VERSION               update bzr branches for wine version VERSION"
-	echo "  --rel REL                   update bzr branches for debian-version REL"
-	echo ""
-}
+if [ ! -d "packaging" ]; then
+	echo "ERROR: Called from wrong directory, aborting." >&2
+	exit 1
+fi
 
 # Print usage message when no arguments are given at all
-if test "$#" -eq 0; then
+if [ "$#" -eq 0 ]; then
 	usage
 	exit 0
 fi
@@ -106,7 +100,7 @@ fi
 ver=""
 rel=""
 
-while test "$#" -gt 0; do
+while [ "$#" -gt 0 ]; do
 	case "$1" in
 		--ver)
 			ver="$2"
@@ -144,5 +138,13 @@ if [ -z "$ver" ]; then
 	exit 1
 fi
 
-update_all "$ver" "$rel"
+if [ ! -d launchpad ]; then
+	mkdir launchpad
+fi
+
+update_bzr launchpad/wine-build-development \
+	"lp:~wine/wine/build-development" "$ver" "$rel" "ubuntu-any-development"
+update_bzr launchpad/wine-build-staging \
+	"lp:~wine/wine/build-staging" "$ver" "$rel" "ubuntu-any-staging"
+
 exit 0
