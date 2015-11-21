@@ -43,20 +43,20 @@ function update_bzr {
 		packaging/tools/generate.py --ver "$ver" --rel "$rel" --skip-name --out "$dir" "$distro"
 	fi
 
-	changes=$(cd "$dir"; bzr diff; true)
+	changes=$(cd "$dir" && bzr diff; true)
 	if [ -z "$changes" ]; then
 		echo "Nothing to commit for $distro"
 		return 0
 	fi
 
-	changes_without_changelog=$(echo "$changes" | filterdiff -x debian/changelog | grep -v "^=== "; true)
-	if [ -z "$changes_without_changelog" ]; then
+	# Check if other files (besides the changelog) have been modified
+	changes=$(echo "$changes" | filterdiff -x debian/changelog | grep -v "^=== "; true)
+	if [ -z "$changes" ]; then
 
 		# Only the changelog changed, check if only the timestamp changed
-		lines_changed=$(cd "$dir"; bzr diff --context=0 | grep -v "\(^=== \|^--- \|^+++ \|^@@ \)" ; true)
-		lines_changed=$(echo "$lines_changed" | grep -v -E '^[+|-] -- .* <[^>]+>  [A-Za-z]+, [0-9]+ [A-Za-z]+ [0-9]+ [0-9]{2}:[0-9]{2}:[0-9]{2} [+-][0-9]{4}'; true)
-
-		if [ -z "$lines_changed" ]; then
+		changes=$(cd "$dir" && bzr diff --context=0 | grep -v "\(^=== \|^--- \|^+++ \|^@@ \)" |
+				  grep -v -E '^[+|-] -- .* <[^>]+>  [A-Za-z]+, [0-9]+ [A-Za-z]+ [0-9]+ [0-9]{2}:[0-9]{2}:[0-9]{2} [+-][0-9]{4}'; true)
+		if [ -z "$changes" ]; then
 			echo "No changes for $distro"
 			return 0
 		fi
@@ -69,11 +69,11 @@ function update_bzr {
 
 	echo "###################################"
 	echo ""
-	(cd "$dir"; bzr diff | colordiff)
+	(cd "$dir" && bzr diff | colordiff)
 	echo "###################################"
 	echo ""
 	read -e -p "Commit message (CTRL-C to abort): " -i "Update to $ver_str" commit_msg
-	(cd "$dir"; bzr add "debian"; bzr commit -m "$commit_msg")
+	(cd "$dir" && bzr add "debian" && bzr commit -m "$commit_msg")
 
 	return 0
 }
@@ -102,7 +102,7 @@ function usage {
 }
 
 # Print usage message when no arguments are given at all
-if [ $# -eq 0 ]; then
+if test "$#" -eq 0; then
 	usage
 	exit 0
 fi
@@ -110,23 +110,26 @@ fi
 ver=""
 rel=""
 
-while [[ $# > 0 ]] ; do
-	CMD="$1"; shift
-	case "$CMD" in
+while test "$#" -gt 0; do
+	case "$1" in
 		--ver)
-			ver="$1"
+			ver="$2"
+			shift
 			shift
 			;;
 		--ver=*)
-			ver="${CMD#*=}";
+			ver="${1#*=}";
+			shift
 			;;
 
 		--rel)
-			rel="$1"
+			rel="$2"
+			shift
 			shift
 			;;
 		--rel=*)
-			rel="${CMD#*=}";
+			rel="${1#*=}";
+			shift
 			;;
 
 		--help)
@@ -134,7 +137,7 @@ while [[ $# > 0 ]] ; do
 			exit 0
 			;;
 		*)
-			echo "ERROR: Unknown argument $CMD." >&2
+			echo "ERROR: Unknown argument $1." >&2
 			exit 1
 			;;
 	esac
