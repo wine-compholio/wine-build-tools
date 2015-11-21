@@ -37,11 +37,7 @@ function update_bzr {
 
 	# remove debian folder
 	rm -rf "$dir/debian"
-	if [ -z "$rel" ]; then
-		packaging/tools/generate.py --ver "$ver" --skip-name --out "$dir" "$distro"
-	else
-		packaging/tools/generate.py --ver "$ver" --rel "$rel" --skip-name --out "$dir" "$distro"
-	fi
+	packaging/tools/generate.py --ver "$ver" --rel "$rel" --skip-name --out "$dir" "$distro"
 
 	changes=$(cd "$dir" && bzr diff; true)
 	if [ -z "$changes" ]; then
@@ -72,7 +68,7 @@ function update_bzr {
 	(cd "$dir" && bzr diff | colordiff)
 	echo "###################################"
 	echo ""
-	read -e -p "Commit message (CTRL-C to abort): " -i "Update to $ver_str" commit_msg
+	read -e -p "Commit message (CTRL-C to abort): " -i "Update to $ver_str." commit_msg
 	(cd "$dir" && bzr add "debian" && bzr commit -m "$commit_msg")
 
 	return 0
