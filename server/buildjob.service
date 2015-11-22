@@ -1,0 +1,9 @@
+[Unit]
+Description=Scheduled build job
+
+[Service]
+Type=simple
+ExecStart=/build/wrapper.sh
+
+[Install]
+WantedBy=multi-user.target
