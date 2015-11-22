@@ -49,7 +49,7 @@ update_bzr()
 
 	# remove debian folder
 	rm -rf "$dir/debian"
-	packaging/tools/generate.py --ver "$ver" --rel "$rel" --skip-name --out "$dir" "$distro"
+	packaging/generate.py --ver "$ver" --rel "$rel" --skip-name --out "$dir" "$distro"
 
 	changes=$(cd "$dir" && bzr diff; true)
 	if [ -z "$changes" ]; then
