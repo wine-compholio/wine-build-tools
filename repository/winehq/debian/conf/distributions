@@ -1,0 +1,50 @@
+Origin: fds-team.de
+Label: pipelight
+Suite: oldstable
+Version: 7.8
+Codename: wheezy
+Architectures: amd64 i386
+Components: main
+UDebComponents: main
+Description: WineHQ packages
+SignWith: DBC3AD43
+
+Origin: fds-team.de
+Label: pipelight
+Suite: stable
+Version: 8.0
+Codename: jessie
+Architectures: amd64 i386
+Components: main
+Description: WineHQ packages
+SignWith: DBC3AD43
+
+Origin: fds-team.de
+Label: pipelight
+Suite: testing
+Version: 9.0
+Codename: stretch
+Architectures: amd64 i386
+Components: main
+Description: WineHQ packages
+SignWith: DBC3AD43
+
+Origin: fds-team.de
+Label: pipelight
+Suite: unstable
+Version: 10.0
+Codename: sid
+Architectures: amd64 i386
+Components: main
+Description: WineHQ packages
+SignWith: DBC3AD43
+
+Origin: fds-team.de
+Label: pipelight
+Suite: avlinux
+Version: 6.0
+Codename: avlinux
+Architectures: amd64 i386
+Components: main
+Description: WineHQ packages
+SignWith: DBC3AD43
