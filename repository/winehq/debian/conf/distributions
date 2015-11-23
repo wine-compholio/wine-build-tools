@@ -1,5 +1,5 @@
 Origin: fds-team.de
-Label: pipelight
+Label: winehq
 Suite: oldstable
 Version: 7.8
 Codename: wheezy
@@ -10,7 +10,7 @@ Description: WineHQ packages
 SignWith: DBC3AD43
 
 Origin: fds-team.de
-Label: pipelight
+Label: winehq
 Suite: stable
 Version: 8.0
 Codename: jessie
@@ -20,7 +20,7 @@ Description: WineHQ packages
 SignWith: DBC3AD43
 
 Origin: fds-team.de
-Label: pipelight
+Label: winehq
 Suite: testing
 Version: 9.0
 Codename: stretch
@@ -30,7 +30,7 @@ Description: WineHQ packages
 SignWith: DBC3AD43
 
 Origin: fds-team.de
-Label: pipelight
+Label: winehq
 Suite: unstable
 Version: 10.0
 Codename: sid
@@ -40,7 +40,7 @@ Description: WineHQ packages
 SignWith: DBC3AD43
 
 Origin: fds-team.de
-Label: pipelight
+Label: winehq
 Suite: avlinux
 Version: 6.0
 Codename: avlinux
