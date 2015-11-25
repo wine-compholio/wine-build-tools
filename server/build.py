@@ -629,6 +629,9 @@ if __name__ == "__main__":
     if not os.path.isdir(args.destination):
         raise RuntimeError("%s is not a directory" % args.destination)
 
+    if len(os.listdir(args.destination)):
+        raise RuntimeError("%s is not empty, refusing to build" % args.destination)
+
     job = None
     try:
         job = BuildJob(args.machine)
