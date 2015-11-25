@@ -1,2 +1,5 @@
 launchpad/
 server/jobs/
+server/tools
+repository/
+winehq-sync.sh
