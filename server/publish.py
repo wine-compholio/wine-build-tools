@@ -133,7 +133,7 @@ def publish(local_path, repository):
         codename = None
         for f in packages_deb:
             print f
-            m = re.match("^(.*)~(.*)_(i386|amd64).deb$", f)
+            m = re.match("^(.*)~(.*)_(i386|amd64)\\.deb$", f)
             assert m is not None
             if codename is None:
                 codename = m.group(2)
