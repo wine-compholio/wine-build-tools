@@ -138,13 +138,13 @@ BUILDER_SETTINGS = {
     # Fedora 22
     "fedora-22-x86": {
         'partition': "/dev/fedora/root",
-        'log_tty'  : "/dev/ttyS2",
+        'log_tty'  : "/dev/ttyS0",
         'build_user':   "builder",
         "build_group":  "builder",
     },
     "fedora-22-x64": {
         'partition': "/dev/fedora/root",
-        'log_tty'  : "/dev/ttyS2",
+        'log_tty'  : "/dev/ttyS0",
         'build_user':   "builder",
         "build_group":  "builder",
     },
