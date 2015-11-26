@@ -1,0 +1,7 @@
+[WineHQ]
+name=Official Wine builds (Fedora 22)
+type=rpm-md
+baseurl=https://dl.winehq.org/wine-builds/fedora/22
+gpgcheck=1
+gpgkey=https://dl.winehq.org/wine-builds/Release.key
+enabled=1
