@@ -7,7 +7,7 @@ Architectures: amd64 i386
 Components: main
 UDebComponents: main
 Description: WineHQ packages
-SignWith: DBC3AD43
+SignWith: 5FCBF54A
 
 Origin: fds-team.de
 Label: winehq
@@ -17,7 +17,7 @@ Codename: jessie
 Architectures: amd64 i386
 Components: main
 Description: WineHQ packages
-SignWith: DBC3AD43
+SignWith: 5FCBF54A
 
 Origin: fds-team.de
 Label: winehq
@@ -27,7 +27,7 @@ Codename: stretch
 Architectures: amd64 i386
 Components: main
 Description: WineHQ packages
-SignWith: DBC3AD43
+SignWith: 5FCBF54A
 
 Origin: fds-team.de
 Label: winehq
@@ -37,7 +37,7 @@ Codename: sid
 Architectures: amd64 i386
 Components: main
 Description: WineHQ packages
-SignWith: DBC3AD43
+SignWith: 5FCBF54A
 
 Origin: fds-team.de
 Label: winehq
@@ -47,4 +47,4 @@ Codename: avlinux
 Architectures: amd64 i386
 Components: main
 Description: WineHQ packages
-SignWith: DBC3AD43
+SignWith: 5FCBF54A

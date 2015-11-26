@@ -1,5 +1,5 @@
 [WineHQ]
-name=Official Wine builds (Fedora 22)
+name=WineHQ packages (Fedora 22)
 type=rpm-md
 baseurl=https://dl.winehq.org/wine-builds/fedora/22
 gpgcheck=1
