@@ -268,7 +268,7 @@ def publish(local_path, repository):
                     shutil.copy(os.path.join(temppath, f), os.path.join(repository, d))
 
                 subprocess.check_call(["createrepo", repository], preexec_fn=_preexec_fn)
-                subprocess.check_call(["gpg", "--detach-sign", "-u", BUILDER_SIGNKEY,
+                subprocess.check_call(["gpg", "--yes", "--detach-sign", "-u", BUILDER_SIGNKEY,
                                        "--armor", os.path.join(repository, "repodata/repomd.xml")])
 
         finally:
