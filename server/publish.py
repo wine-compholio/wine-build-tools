@@ -239,8 +239,16 @@ def publish(local_path, repository):
         assert len(packages_archlinux)  == 0
         assert len(packages_macos)      == 0
 
+        # Make sure packages contain architecture
+        sub_repositories = set()
+        for f in packages_rpm:
+            m = re.match("^(.*)\\.(i686|x86_64)\\.rpm$", f)
+            assert m is not None
+            sub_repositories.add(m.group(2))
+
         # Create repository path if it doesn't exist
-        try_mkdir_p(repository)
+        for d in sub_repositories:
+            try_mkdir_p(os.path.join(repository, d))
 
         temppath = tempfile.mkdtemp()
         try:
@@ -251,11 +259,13 @@ def publish(local_path, repository):
 
             with DirectoryLock(repository):
                 for f in packages_rpm:
-                    if os.path.isfile(os.path.join(repository, f)):
+                    d = re.match("^(.*)\\.(i686|x86_64)\\.rpm$", f).group(2)
+                    if os.path.isfile(os.path.join(os.path.join(repository, d), f)):
                         raise RuntimeError("new package would overwrite existing one")
 
                 for f in packages_rpm:
-                    shutil.copy(os.path.join(temppath, f), repository)
+                    d = re.match("^(.*)\\.(i686|x86_64)\\.rpm$", f).group(2)
+                    shutil.copy(os.path.join(temppath, f), os.path.join(repository, d))
 
                 subprocess.check_call(["createrepo", repository], preexec_fn=_preexec_fn)
                 subprocess.check_call(["gpg", "--detach-sign", "-u", BUILDER_SIGNKEY,
