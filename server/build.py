@@ -149,6 +149,20 @@ BUILDER_SETTINGS = {
         "build_group":  "builder",
     },
 
+    # Fedora 23
+    "fedora-23-x86": {
+        'partition': "/dev/fedora/root",
+        'log_tty'  : "/dev/ttyS1",
+        'build_user':   "builder",
+        "build_group":  "builder",
+    },
+    "fedora-23-x64": {
+        'partition': "/dev/fedora/root",
+        'log_tty'  : "/dev/ttyS1",
+        'build_user':   "builder",
+        "build_group":  "builder",
+    },
+
     # XUbuntu 14.04 with graphical environment
     "xubuntu-14.04-x86-gui": {
         'partition': 0,
