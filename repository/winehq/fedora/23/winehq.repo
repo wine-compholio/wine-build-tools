@@ -1,0 +1,7 @@
+[WineHQ]
+name=WineHQ packages (Fedora 23)
+type=rpm-md
+baseurl=https://dl.winehq.org/wine-builds/fedora/23
+gpgcheck=1
+gpgkey=https://dl.winehq.org/wine-builds/Release.key
+enabled=1
