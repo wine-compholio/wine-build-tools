@@ -1,0 +1,7 @@
+[WineStaging]
+name=Wine Staging packages (Fedora 22)
+type=rpm-md
+baseurl=https://repos.wine-staging.com/fedora/22
+gpgcheck=1
+gpgkey=https://repos.wine-staging.com/Release.key
+enabled=1
