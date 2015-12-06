@@ -80,7 +80,7 @@ class DirectoryLock(object):
         os.rmdir(self.lock)
         return False
 
-def publish(local_path, repository):
+def publish(local_path, repository, signkey):
 
     # Determine status of build
     status_file = os.path.join(local_path, "status")
@@ -142,13 +142,22 @@ def publish(local_path, repository):
         # Validate codename and repository path
         assert codename in ["wheezy", "jessie", "stretch", "sid"]
         assert os.path.isdir(repository)
+        assert os.path.isfile("%s/conf/distributions" % repository)
+
+        # Make sure SignWith: lines reference the same key
+        with open("%s/conf/distributions" % repository) as fp:
+            for line in fp:
+                if not ":" in line: continue
+                k, v = line.rstrip("\n").split(":", 1)
+                if k.strip().lower() == "signwith":
+                    assert v.strip().lower() == signkey.lower()
 
         temppath = tempfile.mkdtemp()
         try:
             for f in packages_deb:
                 shutil.copy(os.path.join(local_path, f), temppath)
                 subprocess.check_call(["dpkg-sig", "--sign", "builder", "-k",
-                                       BUILDER_SIGNKEY, os.path.join(temppath, f)])
+                                       signkey, os.path.join(temppath, f)])
 
             with DirectoryLock(repository):
                 for f in packages_deb:
@@ -171,7 +180,7 @@ def publish(local_path, repository):
         try:
             for f in packages_archlinux:
                 shutil.copy(os.path.join(local_path, f), temppath)
-                subprocess.check_call(["gpg", "--detach-sign", "-u", BUILDER_SIGNKEY,
+                subprocess.check_call(["gpg", "--detach-sign", "-u", signkey,
                                        "--no-armor", os.path.join(temppath, f)])
 
             with DirectoryLock(repository):
@@ -185,7 +194,7 @@ def publish(local_path, repository):
                     shutil.copy(os.path.join(temppath, "%s.sig" % f), repository)
 
                 for f in packages_archlinux:
-                    subprocess.check_call(["repo-add", "-v", "-s", "-k", BUILDER_SIGNKEY,
+                    subprocess.check_call(["repo-add", "-v", "-s", "-k", signkey,
                                            "-d", "-f", os.path.join(repository, "winehq.db.tar.gz"),
                                            os.path.join(repository, f)], preexec_fn=_preexec_fn)
 
@@ -268,7 +277,7 @@ def publish(local_path, repository):
                     shutil.copy(os.path.join(temppath, f), os.path.join(repository, d))
 
                 subprocess.check_call(["createrepo", repository], preexec_fn=_preexec_fn)
-                subprocess.check_call(["gpg", "--yes", "--detach-sign", "-u", BUILDER_SIGNKEY,
+                subprocess.check_call(["gpg", "--yes", "--detach-sign", "-u", signkey,
                                        "--armor", os.path.join(repository, "repodata/repomd.xml")])
 
         finally:
@@ -287,7 +296,7 @@ def publish(local_path, repository):
         try:
             for f in packages_macos:
                 shutil.copy(os.path.join(local_path, f), temppath)
-                subprocess.check_call(["gpg", "--detach-sign", "-u", BUILDER_SIGNKEY,
+                subprocess.check_call(["gpg", "--detach-sign", "-u", signkey,
                                        "--no-armor", os.path.join(temppath, f)])
                 filelist = [f, "%s.sig" % f]
                 with open(os.path.join(temppath, "%s.txt" % f), "wb") as fp:
@@ -322,6 +331,7 @@ def publish(local_path, repository):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Tool to publish packages to a repository")
+    parser.add_argument('--signkey', help="Sign key", default=BUILDER_SIGNKEY)
     parser.add_argument('source', help="Source directory to process")
     parser.add_argument('destination', help="Destination repository")
     args = parser.parse_args()
@@ -329,5 +339,5 @@ if __name__ == "__main__":
     if not os.path.isdir(args.source):
         raise RuntimeError("%s is not a directory" % args.source)
 
-    publish(args.source, args.destination)
+    publish(args.source, args.destination, args.signkey)
     exit(0)
