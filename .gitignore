@@ -3,3 +3,4 @@ server/jobs/
 server/tools
 repository/
 winehq-sync.sh
+fds-team-sync.sh
