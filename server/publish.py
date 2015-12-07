@@ -80,6 +80,18 @@ class DirectoryLock(object):
         os.rmdir(self.lock)
         return False
 
+def key_fingerprint(filename):
+
+    def _preexec_fn():
+        os.environ["LANG"] = "C"
+
+    # Use gpg to get fingerprint of key file
+    assert os.path.isfile(filename)
+    output = subprocess.check_output(["gpg", "--with-fingerprint", "--", filename], preexec_fn=_preexec_fn)
+    m = re.match("^\\s+Key fingerprint = ([ 0-9A-F]+)$", output.split("\n")[1])
+    assert m is not None
+    return m.group(1).replace(" ", "")
+
 def publish(local_path, repository, signkey):
 
     # Determine status of build
@@ -142,15 +154,18 @@ def publish(local_path, repository, signkey):
         # Validate codename and repository path
         assert codename in ["wheezy", "jessie", "stretch", "sid"]
         assert os.path.isdir(repository)
-        assert os.path.isfile("%s/conf/distributions" % repository)
+        assert os.path.isfile(os.path.join(repository, "conf/distributions"))
 
         # Make sure SignWith: lines reference the same key
-        with open("%s/conf/distributions" % repository) as fp:
+        with open(os.path.join(repository, "conf/distributions")) as fp:
             for line in fp:
                 if not ":" in line: continue
                 k, v = line.rstrip("\n").split(":", 1)
                 if k.strip().lower() == "signwith":
                     assert v.strip().lower() == signkey.lower()
+
+        # Verify repository key
+        assert key_fingerprint(os.path.join(repository, "../Release.key")).endswith(signkey)
 
         temppath = tempfile.mkdtemp()
         try:
@@ -175,6 +190,9 @@ def publish(local_path, repository, signkey):
 
         # Create repository path if it doesn't exist
         try_mkdir_p(repository)
+
+        # Verify repository key
+        assert key_fingerprint(os.path.join(repository, "../../Release.key")).endswith(signkey)
 
         temppath = tempfile.mkdtemp()
         try:
@@ -218,6 +236,11 @@ def publish(local_path, repository, signkey):
         for d in sub_repositories:
             try_mkdir_p(os.path.join(repository, d))
 
+        # Verify repository key
+        assert key_fingerprint(os.path.join(repository, "../../Release.key")).endswith(signkey)
+        for d in sub_repositories:
+            assert key_fingerprint(os.path.join(repository, "%s/media_info/pubkey" % d)).endswith(signkey)
+
         temppath = tempfile.mkdtemp()
         try:
             for f in packages_rpm:
@@ -259,6 +282,9 @@ def publish(local_path, repository, signkey):
         for d in sub_repositories:
             try_mkdir_p(os.path.join(repository, d))
 
+        # Verify repository key
+        assert key_fingerprint(os.path.join(repository, "../../Release.key")).endswith(signkey)
+
         temppath = tempfile.mkdtemp()
         try:
             for f in packages_rpm:
@@ -291,6 +317,9 @@ def publish(local_path, repository, signkey):
 
         # Create repository path if it doesn't exist
         try_mkdir_p(repository)
+
+        # Verify repository key
+        assert key_fingerprint(os.path.join(repository, "../../Release.key")).endswith(signkey)
 
         temppath = tempfile.mkdtemp()
         try:

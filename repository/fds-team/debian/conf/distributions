@@ -7,7 +7,7 @@ Architectures: amd64 i386
 Components: main
 UDebComponents: main
 Description: Pipelight packages
-SignWith: DBC3AD43
+SignWith: 5DC2D5CA
 
 Origin: fds-team.de
 Label: pipelight
@@ -17,7 +17,7 @@ Codename: jessie
 Architectures: amd64 i386
 Components: main
 Description: Pipelight packages
-SignWith: DBC3AD43
+SignWith: 5DC2D5CA
 
 Origin: fds-team.de
 Label: pipelight
@@ -27,7 +27,7 @@ Codename: stretch
 Architectures: amd64 i386
 Components: main
 Description: Pipelight packages
-SignWith: DBC3AD43
+SignWith: 5DC2D5CA
 
 Origin: fds-team.de
 Label: pipelight
@@ -37,7 +37,7 @@ Codename: sid
 Architectures: amd64 i386
 Components: main
 Description: Pipelight packages
-SignWith: DBC3AD43
+SignWith: 5DC2D5CA
 
 Origin: fds-team.de
 Label: pipelight
@@ -47,4 +47,4 @@ Codename: avlinux
 Architectures: amd64 i386
 Components: main
 Description: Pipelight packages
-SignWith: DBC3AD43
+SignWith: 5DC2D5CA
