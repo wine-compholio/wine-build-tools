@@ -588,11 +588,15 @@ class BuildJob(object):
         if status != 0:
             raise RuntimeError("Build exited with status code %d" % status)
 
-    def prepare(self, local_path):
+    def prepare(self, local_path, local_deps=None):
         assert os.path.isdir(local_path)
         assert os.path.isfile(os.path.join(local_path, "boot.sh"))
         self.fs_upload_recursive("/build/source", local_path)
         assert self.fs_is_file("/build/source/boot.sh")
+
+        if local_deps is not None:
+            assert os.path.isdir(local_deps)
+            self.fs_upload_recursive("/build/source/deps", local_deps)
 
     def publish(self, local_path):
         assert os.path.isdir(local_path)
@@ -630,6 +634,7 @@ class BuildJob(object):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Minimalistic build server")
     parser.add_argument('--machine', help="Select build VM", required=True)
+    parser.add_argument('--dependencies', help="Additional build dependencies", default=None)
     parser.add_argument('source', help="Source directory to process")
     parser.add_argument('destination', help="Destination directory")
     args = parser.parse_args()
@@ -649,7 +654,7 @@ if __name__ == "__main__":
     job = None
     try:
         job = BuildJob(args.machine)
-        job.prepare(args.source)
+        job.prepare(args.source, args.dependencies)
         job.build()
         job.publish(args.destination)
     finally:
