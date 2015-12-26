@@ -584,9 +584,7 @@ class BuildJob(object):
         if not self.fs_is_file("/build/status"):
             raise RuntimeError("Unable to determine status, build was aborted?")
 
-        status = int(self.fs_download_content("/build/status"))
-        if status != 0:
-            raise RuntimeError("Build exited with status code %d" % status)
+        return int(self.fs_download_content("/build/status"))
 
     def prepare(self, local_path, local_deps=None):
         assert os.path.isdir(local_path)
@@ -635,6 +633,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Minimalistic build server")
     parser.add_argument('--machine', help="Select build VM", required=True)
     parser.add_argument('--dependencies', help="Additional build dependencies", default=None)
+    parser.add_argument('--debug', action='store_true', help="Enable debug mode")
     parser.add_argument('source', help="Source directory to process")
     parser.add_argument('destination', help="Destination directory")
     args = parser.parse_args()
@@ -651,14 +650,19 @@ if __name__ == "__main__":
     if len(os.listdir(args.destination)):
         raise RuntimeError("%s is not empty, refusing to build" % args.destination)
 
+    status = 1
     job = None
     try:
         job = BuildJob(args.machine)
         job.prepare(args.source, args.dependencies)
-        job.build()
+
+        status = job.build()
+        if status != 0 and not args.debug:
+            raise RuntimeError("Build exited with status code %d" % status)
+
         job.publish(args.destination)
     finally:
         if job is not None:
             job._destroy()
 
-    exit(0)
+    exit(status)
