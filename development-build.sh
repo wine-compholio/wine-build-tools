@@ -21,7 +21,7 @@
 
 set -eux
 
-VERSION="1.8"
+VERSION="1.9.0"
 RELEASE=""
 
 for codename in stretch wheezy jessie sid; do
