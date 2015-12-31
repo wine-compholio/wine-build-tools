@@ -109,7 +109,7 @@ def publish(local_path, repository, signkey):
     packages_deb        = []
     packages_rpm        = []
     packages_archlinux  = []
-    packages_macos      = []
+    packages_macosx     = []
 
     for f in os.listdir(local_path):
         if os.path.isfile(os.path.join(local_path, f)):
@@ -119,8 +119,10 @@ def publish(local_path, repository, signkey):
                 packages_rpm.append(f)
             elif f.endswith(".pkg.tar.xz"):
                 packages_archlinux.append(f)
-            elif re.match("^.*-osx([0-9]+(\\.[0-9]+)?)?\\.pkg$", f):
-                packages_macos.append(f)
+            elif f.endswith(".pkg"):
+                packages_macosx.append(f)
+            elif re.match("^portable-.*-osx\\.tar\\.gz$", f):
+                packages_macosx.append(f)
 
     # needed for repo-add / genhdlist2
     def _preexec_fn():
@@ -141,7 +143,7 @@ def publish(local_path, repository, signkey):
         assert len(packages_deb)        > 0
         assert len(packages_rpm)        == 0
         assert len(packages_archlinux)  == 0
-        assert len(packages_macos)      == 0
+        assert len(packages_macosx)     == 0
 
         # Get codename from package files
         codename = None
@@ -188,7 +190,7 @@ def publish(local_path, repository, signkey):
         assert len(packages_deb)        == 0
         assert len(packages_rpm)        == 0
         assert len(packages_archlinux)  > 0
-        assert len(packages_macos)      == 0
+        assert len(packages_macosx)     == 0
 
         # Create repository path if it doesn't exist
         try_mkdir_p(repository)
@@ -225,7 +227,7 @@ def publish(local_path, repository, signkey):
         assert len(packages_deb)        == 0
         assert len(packages_rpm)        > 0
         assert len(packages_archlinux)  == 0
-        assert len(packages_macos)      == 0
+        assert len(packages_macosx)     == 0
 
         # Make sure packages contain architecture
         sub_repositories = set()
@@ -273,7 +275,7 @@ def publish(local_path, repository, signkey):
         assert len(packages_deb)        == 0
         assert len(packages_rpm)        > 0
         assert len(packages_archlinux)  == 0
-        assert len(packages_macos)      == 0
+        assert len(packages_macosx)     == 0
 
         # Make sure packages contain architecture
         sub_repositories = set()
@@ -319,7 +321,7 @@ def publish(local_path, repository, signkey):
         assert len(packages_deb)        == 0
         assert len(packages_rpm)        == 0
         assert len(packages_archlinux)  == 0
-        assert len(packages_macos)      > 0
+        assert len(packages_macosx)     > 0
 
         # Create repository path if it doesn't exist
         try_mkdir_p(repository)
@@ -329,33 +331,35 @@ def publish(local_path, repository, signkey):
 
         temppath = tempfile.mkdtemp()
         try:
-            for f in packages_macos:
+            checksums = {}
+            for f in packages_macosx:
                 shutil.copy(os.path.join(local_path, f), temppath)
                 subprocess.check_call(["gpg", "--detach-sign", "-u", signkey,
                                        "--no-armor", os.path.join(temppath, f)])
-                filelist = [f, "%s.sig" % f]
-                with open(os.path.join(temppath, "%s.txt" % f), "wb") as fp:
-                    fp.write("SHA256SUMS:\n")
-                    fp.flush()
-                    subprocess.check_call(["sha256sum", "--"] + filelist, cwd=temppath,
-                                          stdout=fp, stderr=subprocess.STDOUT)
-                    fp.write("\n")
-                    fp.write("MD5SUMS:\n")
-                    fp.flush()
-                    subprocess.check_call(["md5sum", "--"] + filelist, cwd=temppath,
-                                          stdout=fp, stderr=subprocess.STDOUT)
+                checksums[f] = subprocess.check_output(["sha256sum", "--", f], cwd=temppath).split("  ", 1)[0]
 
             with DirectoryLock(repository):
-                for f in packages_macos:
+                for f in packages_macosx:
                     if os.path.isfile(os.path.join(repository, f)) or \
-                       os.path.isfile(os.path.join(repository, "%s.sig" % f)) or \
-                       os.path.isfile(os.path.join(repository, "%s.txt" % f)):
+                       os.path.isfile(os.path.join(repository, "%s.sig" % f)):
                         raise RuntimeError("new package would overwrite existing one")
 
-                for f in packages_macos:
+                for f in packages_macosx:
                     shutil.copy(os.path.join(temppath, f), repository)
                     shutil.copy(os.path.join(temppath, "%s.sig" % f), repository)
-                    shutil.copy(os.path.join(temppath, "%s.txt" % f), repository)
+
+                # Update SHA256SUMS file with newly added packages.
+                # We don't want to recalculate all checksums, so do this manually.
+
+                if os.path.exists(os.path.join(repository, "SHA256SUMS")):
+                    with open(os.path.join(repository, "SHA256SUMS"), "r") as fp:
+                        for line in fp:
+                            sha, f = line.rstrip().split("  ", 1)
+                            if not checksums.has_key(f): checksums[f] = sha
+
+                with open(os.path.join(repository, "SHA256SUMS"), "w") as fp:
+                    for f, sha in sorted(checksums.items()):
+                        fp.write("%s  %s\n" % (sha, f))
 
         finally:
             shutil.rmtree(temppath)
