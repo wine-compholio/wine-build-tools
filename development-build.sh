@@ -24,6 +24,15 @@ set -eux
 VERSION="1.9.0"
 RELEASE=""
 
+mkdir -p "repository/raw/macosx-wine-development"
+repo_path="repository/raw/macosx-wine-development/$VERSION$RELEASE-x86"
+[ -d "$repo_path" ] && rmdir --ignore-fail-on-non-empty "$repo_path"
+if mkdir "$repo_path"; then
+	./server/build.py --machine "debian-jessie-x86" \
+		--dependencies "repository/raw/macosx-toolchain-1.0.0/deps" \
+		"temp/macosx-wine-development" "$repo_path"
+fi
+
 for codename in stretch wheezy jessie sid; do
 	mkdir -p "repository/raw/debian-$codename-development"
 	for arch in x86 x64; do
