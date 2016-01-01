@@ -24,6 +24,9 @@ set -eux
 VERSION="1.9.0"
 RELEASE=""
 
+repo_path="repository/raw/macosx-wine-development/$VERSION$RELEASE-x86"
+./server/publish.py "$repo_path" repository/winehq/macosx/i686
+
 for codename in stretch wheezy jessie sid; do
 	mkdir -p "repository/raw/debian-$codename-development"
 	for arch in x86 x64; do
