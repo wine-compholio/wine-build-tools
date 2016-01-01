@@ -344,18 +344,15 @@ def publish(local_path, repository, signkey):
                        os.path.isfile(os.path.join(repository, "%s.sig" % f)):
                         raise RuntimeError("new package would overwrite existing one")
 
-                for f in packages_macosx:
-                    shutil.copy(os.path.join(temppath, f), repository)
-                    shutil.copy(os.path.join(temppath, "%s.sig" % f), repository)
-
-                # Update SHA256SUMS file with newly added packages.
-                # We don't want to recalculate all checksums, so do this manually.
-
                 if os.path.exists(os.path.join(repository, "SHA256SUMS")):
                     with open(os.path.join(repository, "SHA256SUMS"), "r") as fp:
                         for line in fp:
                             sha, f = line.rstrip().split("  ", 1)
                             if not checksums.has_key(f): checksums[f] = sha
+
+                for f in packages_macosx:
+                    shutil.copy(os.path.join(temppath, f), repository)
+                    shutil.copy(os.path.join(temppath, "%s.sig" % f), repository)
 
                 with open(os.path.join(repository, "SHA256SUMS"), "w") as fp:
                     for f, sha in sorted(checksums.items()):
