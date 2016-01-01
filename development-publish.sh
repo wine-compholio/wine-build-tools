@@ -28,7 +28,6 @@ repo_path="repository/raw/macosx-wine-development/$VERSION$RELEASE-x86"
 ./server/publish.py "$repo_path" repository/winehq/macosx/i686
 
 for codename in stretch wheezy jessie sid; do
-	mkdir -p "repository/raw/debian-$codename-development"
 	for arch in x86 x64; do
 
 		repo_path="repository/raw/debian-$codename-development/$VERSION$RELEASE-$arch"
@@ -38,7 +37,6 @@ for codename in stretch wheezy jessie sid; do
 done
 
 for codename in 5 4; do
-	mkdir -p "repository/raw/mageia-$codename-development"
 	for arch in x86 x64; do
 
 		repo_path="repository/raw/mageia-$codename-development/$VERSION$RELEASE-$arch"
@@ -48,7 +46,6 @@ for codename in 5 4; do
 done
 
 for codename in 22 23; do
-	mkdir -p "repository/raw/fedora-$codename-development"
 	for arch in x86 x64; do
 
 		repo_path="repository/raw/fedora-$codename-development/$VERSION$RELEASE-$arch"

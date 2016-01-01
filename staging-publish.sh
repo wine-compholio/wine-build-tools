@@ -29,7 +29,6 @@ repo_path="repository/raw/macosx-wine-staging/$VERSION$RELEASE-x86"
 ./server/publish.py --signkey 5DC2D5CA "$repo_path" repository/fds-team/macosx/i686
 
 for codename in stretch wheezy jessie sid; do
-	mkdir -p "repository/raw/debian-$codename-staging"
 	for arch in x86 x64; do
 
 		repo_path="repository/raw/debian-$codename-staging/$VERSION$RELEASE-$arch"
@@ -40,7 +39,6 @@ for codename in stretch wheezy jessie sid; do
 done
 
 for codename in 5 4; do
-	mkdir -p "repository/raw/mageia-$codename-staging"
 	for arch in x86 x64; do
 
 		repo_path="repository/raw/mageia-$codename-staging/$VERSION$RELEASE-$arch"
@@ -51,7 +49,6 @@ for codename in 5 4; do
 done
 
 for codename in 22 23; do
-	mkdir -p "repository/raw/fedora-$codename-staging"
 	for arch in x86 x64; do
 
 		repo_path="repository/raw/fedora-$codename-staging/$VERSION$RELEASE-$arch"
