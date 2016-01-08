@@ -27,6 +27,7 @@ RELEASE=""
 repo_path="repository/raw/macosx-wine-staging/$VERSION$RELEASE-x86"
 ./server/publish.py "$repo_path" repository/winehq/macosx/i686
 ./server/publish.py --signkey 5DC2D5CA "$repo_path" repository/fds-team/macosx/i686
+./server/osx-download-page.py repository/winehq/macosx
 
 for codename in stretch wheezy jessie sid; do
 	for arch in x86 x64; do
