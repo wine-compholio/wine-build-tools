@@ -3,7 +3,7 @@
 # Script to push changes to launchpad
 #
 # Copyright (C) 2015 Michael Müller
-# Copyright (C) 2015 Sebastian Lackner
+# Copyright (C) 2015-2016 Sebastian Lackner
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,70 +19,60 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
 #
-set -eu
-
-usage()
-{
-	echo ""
-	echo "Usage: launchpad-update.sh --ver VERSION [--rel REL]"
-	echo ""
-	echo "  --ver VERSION               update bzr branches for wine version VERSION"
-	echo "  --rel REL                   update bzr branches for debian-version REL"
-	echo ""
-}
+set -eux
 
 update_bzr()
 {
-	dir="$1"
-	url="$2"
-	ver="$3"
-	rel="$4"
-	distro="$5"
+	bzrurl="$1"
+	distro="$2"
 
-	# Until someone tells me a bzr alternative for
-	# git reset --hard origin; git clean -f -d
-	# remove pre existing checkouts and use lightweights ones
-	# (cd "$dir"; bzr revert -q; bzr uncommit -q --local --force; bzr pull --overwrite "$url")
+	if [ ! -d "temp/$distro/debian" ]; then
+		echo "ERROR: No packaging files found for $distro, run packaging/generate.py first." >&2
+		exit 1
+	fi
 
-	rm -rf "$dir"
-	bzr checkout --lightweight "$url" "$dir"
+	# Checkout repository
+	mkdir -p launchpad
+	rm -rf "launchpad/$distro"
+	bzr checkout --lightweight "$bzrurl" "launchpad/$distro"
 
-	# remove debian folder
-	rm -rf "$dir/debian"
-	packaging/generate.py --ver "$ver" --rel "$rel" --skip-name --out "$dir" "$distro"
+	# Update debian/ directory
+	rm -rf "launchpad/$distro/debian"
+	cp -r "temp/$distro/debian" "launchpad/$distro"
 
-	changes=$(cd "$dir" && bzr diff; true)
-	if [ -z "$changes" ]; then
+	# Compute diff
+	tmpfile=$(mktemp)
+	(cd "launchpad/$distro"; bzr diff || true) > "$tmpfile"
+
+	# Empty diff -> nothing to commit
+	if [ ! -s "$tmpfile" ]; then
 		echo "Nothing to commit for $distro"
+		rm "$tmpfile"
 		return 0
 	fi
 
-	# Check if other files (besides the changelog) have been modified
-	changes=$(echo "$changes" | filterdiff -x debian/changelog | grep -v "^=== "; true)
-	if [ -z "$changes" ]; then
-
-		# Only the changelog changed, check if only the timestamp changed
-		changes=$(cd "$dir" && bzr diff --context=0 | grep -v "\(^=== \|^--- \|^+++ \|^@@ \)" |
-				  grep -v -E '^[+|-] -- .* <[^>]+>  [A-Za-z]+, [0-9]+ [A-Za-z]+ [0-9]+ [0-9]{2}:[0-9]{2}:[0-9]{2} [+-][0-9]{4}'; true)
-		if [ -z "$changes" ]; then
-			echo "No changes for $distro"
+	# Only timestamp changed -> nothing to commit
+	if ! cat "$tmpfile" | filterdiff -x debian/changelog | grep "^+++" &> /dev/null; then
+		if ! cat "$tmpfile" | grep -v "\(^--- \|^+++ \)" |
+			 grep -v "^[+-] -- .* <[^>]\+>  .*" | grep "^[+-]"; then
+			echo "Nothing to commit for $distro"
+			rm "$tmpfile"
 			return 0
 		fi
 	fi
 
-	ver_str="$ver"
-	if [ ! -z "$rel" ]; then
-		ver_str="$ver_str-$rel"
-	fi
-
 	echo "###################################"
 	echo ""
-	(cd "$dir" && bzr diff | colordiff)
+	cat "$tmpfile" | colordiff
 	echo "###################################"
 	echo ""
-	read -e -p "Commit message (CTRL-C to abort): " -i "Update to $ver_str." commit_msg
-	(cd "$dir" && bzr add "debian" && bzr commit -m "$commit_msg")
 
+	# Read commit message and commit changes
+	version=$(head -n1 "launchpad/$distro/debian/changelog" | sed -e 's/.*(\(.*\)).*/\1/')
+	read -e -p "Commit message (CTRL-C to abort): " -i "Update to $version." commit_msg
+	(cd "launchpad/$distro"; bzr add "debian" && bzr commit -m "$commit_msg")
+
+	rm "$tmpfile"
 	return 0
 }
 
@@ -91,60 +81,7 @@ if [ ! -d "packaging" ]; then
 	exit 1
 fi
 
-# Print usage message when no arguments are given at all
-if [ "$#" -eq 0 ]; then
-	usage
-	exit 0
-fi
-
-ver=""
-rel=""
-
-while [ "$#" -gt 0 ]; do
-	case "$1" in
-		--ver)
-			ver="$2"
-			shift
-			shift
-			;;
-		--ver=*)
-			ver="${1#*=}";
-			shift
-			;;
-
-		--rel)
-			rel="$2"
-			shift
-			shift
-			;;
-		--rel=*)
-			rel="${1#*=}";
-			shift
-			;;
-
-		--help)
-			usage
-			exit 0
-			;;
-		*)
-			echo "ERROR: Unknown argument $1." >&2
-			exit 1
-			;;
-	esac
-done
-
-if [ -z "$ver" ]; then
-	usage
-	exit 1
-fi
-
-if [ ! -d launchpad ]; then
-	mkdir launchpad
-fi
-
-update_bzr launchpad/wine-build-development \
-	"lp:~wine/wine/build-development" "$ver" "$rel" "ubuntu-any-development"
-update_bzr launchpad/wine-build-staging \
-	"lp:~wine/wine/build-staging" "$ver" "$rel" "ubuntu-any-staging"
+update_bzr "lp:~wine/wine/build-development" "ubuntu-any-development"
+update_bzr "lp:~wine/wine/build-staging" "ubuntu-any-staging"
 
 exit 0
