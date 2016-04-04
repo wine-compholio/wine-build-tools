@@ -1,0 +1,92 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <title>Index of /wine-builds/macosx</title>
+  <link rel="stylesheet" href="/share/theme/style.css" type="text/css" />
+<meta name="viewport" content="width=device-width, initial-scale=1" /><link rel="shortcut icon" type="image/png" href="https://www.winehq.org/images/winehq_logo_16.png" /> </head>
+ <body>
+
+<div id="logo_glass" class="pos">
+    <a href="https://www.winehq.org"><img src="https://www.winehq.org/images/winehq_logo_glass_sm.png" alt="" /></a>
+</div>
+<div id="logo_text" class="pos">
+    <a href="https://www.winehq.org"><img src="https://www.winehq.org/images/winehq_logo_text.png" alt="WineHQ" title="WineHQ" /></a>
+</div>
+
+<div id="logo_blurb">Run Windows applications on Linux, BSD, Solaris and Mac OS X.</div>
+
+<div id="search_box">
+  <form action="https://www.winehq.org/search/" id="cse-search-box" style="margin: 0; padding: 0;">
+    <span style="color: #ffffff;">Search:</span> <input type="text" name="q" size="20">
+  </form>
+</div>
+
+<div id="tabs" class="pos">
+    <ul>
+        <li class="s"><a href="https://www.winehq.org/">WineHQ</a></li>
+        <li><a href="http://wiki.winehq.org/">Wiki</a></li>
+        <li><a href="https://appdb.winehq.org/">AppDB</a></li>
+        <li><a href="https://bugs.winehq.org/">Bugzilla</a></li>
+        <li><a href="https://forums.winehq.org/">Forums</a></li>
+    </ul>
+</div>
+
+<div id="main_content">
+    <div class="content cornerround" style="padding: 35px 20px 10px 80px">
+    <!-- Start Content -->
+
+<h1 class="title">Wine Download Server</h1>
+
+<div class="wrapper">
+
+<table><tr><th><img src="/share/theme/icons/blank.png" alt="[ICO]" /></th><th><a href="#">Name</a></th><th><a href="#">Latest version</a></th><th><a href="#">Size</a></th></tr>
+{{ for pkg in pkg_packages }}
+<tr><td valign="top"><a href="{{ =pkg['filename'] }}"><img src="/share/theme/icons/package.png" alt="[   ]" /></a></td><td style="line-height: normal;"><a href="{{ =pkg['filename'] }}">{{ =pkg['name'] }}</a><div style="color: gray; font-family: monospace; font-size: 0.6em; margin-top: 0.5em;">SHA256: {{ =pkg['sha256'] }}</div></td><td align="right">{{ =pkg['version'] }}  </td><td align="right"> {{ =pkg['size'] }}</td></tr>
+{{ endfor }}
+</table>
+
+<p style="text-align: center; margin-top: 20pt; margin-bottom: 20pt; color: gray; font-size: 10pt;">Alternatively, all packages are also available as .tar.gz files:</p>
+
+<table><tr><th><img src="/share/theme/icons/blank.png" alt="[ICO]" /></th><th><a href="#">Name</a></th><th><a href="#">Latest version</a></th><th><a href="#">Size</a></th></tr>
+{{ for pkg in tar_packages }}
+<tr><td valign="top"><a href="{{ =pkg['filename'] }}"><img src="/share/theme/icons/archive.png" alt="[   ]" /></a></td><td style="line-height: normal;"><a href="{{ =pkg['filename'] }}">{{ =pkg['name'] }}</a><div style="color: gray; font-family: monospace; font-size: 0.6em; margin-top: 0.5em;">SHA256: {{ =pkg['sha256'] }}</div></td><td align="right">{{ =pkg['version'] }}  </td><td align="right"> {{ =pkg['size'] }}</td></tr>
+{{ endfor }}
+</table>
+
+<p style="text-align: center; margin-top: 20pt; margin-bottom: 20pt; color: gray; font-size: 10pt;">To download an older version, please follow the link below:</p>
+
+<table><tr><th><img src="/share/theme/icons/blank.png" alt="[ICO]" /></th><th><a href="#">Name</a></th><th><a href="#">Last modified</a></th><th><a href="#">Size</a></th></tr>
+{{ for dir in subdirectories }}
+<tr><td valign="top"><a href="{{ =dir['name'] }}/"><img src="/share/theme/icons/folder.png" alt="[DIR]" /></a></td><td><a href="{{ =dir['name'] }}/">{{ =dir['name'] }}/</a></td><td align="right">{{ =dir['modified'] }}  </td><td align="right">  - </td></tr>
+{{ endfor }}
+</table>
+    <div class="block">
+    </div><!--/.postlisting-->
+
+</div><!--/.wrapper-->
+
+      </div>
+    </div>
+
+</div>
+
+
+<!-- END BODY -->
+
+</div>
+
+<div id="footer">
+    Hosted By
+    <a href="https://www.codeweavers.com/"><img src="https://www.winehq.org/images/cw_logo_sm.png" alt="CodeWeavers"
+    title="CodeWeavers - Run Windows applications and games on Mac and Linux" /></a><br /> and 
+    <a href="https://www.fastly.com"><img src="https://www.fastly.com/sites/default/files/fastly_logo.png" alt="Fastly"
+    title="Fastly" style="width:110px;" /></a>
+</div>
+
+<script type="text/javascript">
+// grab the 2nd child and add the parent class. tr:nth-child(2)
+document.getElementsByTagName('tr')[1].className = 'parent';
+</script>
+
+</body></html>
