@@ -2,7 +2,7 @@
 #
 # Script to build tools for OSX.
 #
-# Copyright (C) 2015 Sebastian Lackner
+# Copyright (C) 2015-2016 Sebastian Lackner
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -21,18 +21,18 @@
 
 set -eux
 
-VERSION="1.0.0"
+VERSION="2.0.0"
 
 deps_path="repository/raw/macosx-toolchain-$VERSION/deps"
 mkdir -p "$deps_path"
 
 # Compile native tools
 mkdir -p "repository/raw/macosx-toolchain-$VERSION/tool"
-for tool in clang bomutils cctools xar; do
+for tool in clang llvm-defaults bomutils cctools cctools64 xar; do
 	repo_path="repository/raw/macosx-toolchain-$VERSION/tool/$tool"
 	[ -d "$repo_path" ] && rmdir --ignore-fail-on-non-empty "$repo_path"
 	if mkdir "$repo_path"; then
-		./server/build.py --machine "debian-jessie-x86" --dependencies "$deps_path" \
+		./server/build.py --machine "debian-stretch-x64" --dependencies "$deps_path" \
 		"temp/macosx-$tool-native" "$repo_path"
 		cp -a "$repo_path"/*.deb "$deps_path"
 	fi
@@ -44,8 +44,9 @@ for package in libjpeg-turbo liblzma libtiff liblcms2 libxml2 libxslt libopenal-
 	repo_path="repository/raw/macosx-toolchain-$VERSION/package/$package"
 	[ -d "$repo_path" ] && rmdir --ignore-fail-on-non-empty "$repo_path"
 	if mkdir "$repo_path"; then
-		./server/build.py --machine "debian-jessie-x86" --dependencies "$deps_path" \
+		./server/build.py --machine "debian-stretch-x64" --dependencies "$deps_path" \
 		"temp/macosx-$package" "$repo_path"
 		cp -a "$repo_path"/*-osx.tar.gz "$deps_path"
+		cp -a "$repo_path"/*-osx64.tar.gz "$deps_path"
 	fi
 done
