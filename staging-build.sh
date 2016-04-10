@@ -28,8 +28,8 @@ mkdir -p "repository/raw/macosx-wine-staging"
 repo_path="repository/raw/macosx-wine-staging/$VERSION$RELEASE-x86"
 [ -d "$repo_path" ] && rmdir --ignore-fail-on-non-empty "$repo_path"
 if mkdir "$repo_path"; then
-	./server/build.py --machine "debian-jessie-x86" \
-		--dependencies "repository/raw/macosx-toolchain-1.0.0/deps" \
+	./server/build.py --machine "debian-stretch-x64" \
+		--dependencies "repository/raw/macosx-toolchain-2.0.0/deps" \
 		"temp/macosx-wine-staging" "$repo_path"
 fi
 
