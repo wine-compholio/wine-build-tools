@@ -121,7 +121,7 @@ def publish(local_path, repository, signkey):
                 packages_archlinux.append(f)
             elif f.endswith(".pkg"):
                 packages_macosx.append(f)
-            elif re.match("^portable-.*-osx\\.tar\\.gz$", f):
+            elif re.match("^portable-.*-osx(64)?\\.tar\\.gz$", f):
                 packages_macosx.append(f)
 
     # needed for repo-add / genhdlist2
