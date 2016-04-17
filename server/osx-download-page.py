@@ -174,9 +174,10 @@ def update_template(repository):
         if not packages.has_key(name): continue
         candidates = packages[name]
         candidates.sort(key=lambda x: x[3], reverse=True)
-        filename, _, version, _ = packages[name][0]
+        base_filename, _, version, _ = packages[name][0]
 
         # installer
+        filename = base_filename
         full_path = os.path.join(repository, "i686", filename)
         size = (os.path.getsize(full_path) + 1024 * 1024 / 2) / (1024 * 1024)
         pkg_packages.append({ "name":       pkg_name,
@@ -185,16 +186,27 @@ def update_template(repository):
                               "version":    version,
                               "size":       "%dM" % size })
 
-        # tarball
-        filename = "portable-%s-osx.tar.gz" % filename[:-4]
+        # tarball (32-bit)
+        filename = "portable-%s-osx.tar.gz" % base_filename[:-4]
         full_path = os.path.join(repository, "i686", filename)
-        if not os.path.isfile(full_path): continue
-        size = (os.path.getsize(full_path) + 1024 * 1024 / 2) / (1024 * 1024)
-        tar_packages.append({ "name":       tar_name,
-                              "filename":   os.path.join("i686", filename),
-                              "sha256":     sha256sums[filename],
-                              "version":    version,
-                              "size":       "%dM" % size })
+        if os.path.isfile(full_path):
+            size = (os.path.getsize(full_path) + 1024 * 1024 / 2) / (1024 * 1024)
+            tar_packages.append({ "name":       "%s (32-bit)" % tar_name,
+                                  "filename":   os.path.join("i686", filename),
+                                  "sha256":     sha256sums[filename],
+                                  "version":    version,
+                                  "size":       "%dM" % size })
+
+        # tarball (64-bit)
+        filename = "portable-%s-osx64.tar.gz" % base_filename[:-4]
+        full_path = os.path.join(repository, "i686", filename)
+        if os.path.isfile(full_path):
+            size = (os.path.getsize(full_path) + 1024 * 1024 / 2) / (1024 * 1024)
+            tar_packages.append({ "name":       "%s (64-bit)" % tar_name,
+                                  "filename":   os.path.join("i686", filename),
+                                  "sha256":     sha256sums[filename],
+                                  "version":    version,
+                                  "size":       "%dM" % size })
 
     # Get list of all subdirectories
     timezone = pytz.timezone("Etc/GMT+6")
