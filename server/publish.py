@@ -33,10 +33,12 @@ import time
 
 BUILDER_SIGNKEY = "5FCBF54A"
 BUILDER_TOOLS   = os.path.join(os.path.dirname(os.path.realpath(__file__)), "./tools")
+BUILDER_CERTS   = os.path.join(os.path.dirname(os.path.realpath(__file__)), "./certs")
 assert os.path.isdir(os.path.join(BUILDER_TOOLS, "bin"))
 assert os.path.isdir(os.path.join(BUILDER_TOOLS, "lib/x86_64-linux-gnu/perl5/5.20"))
 assert os.path.isdir(os.path.join(BUILDER_TOOLS, "share/perl5"))
 assert os.path.isfile(os.path.expanduser("~/.rpmmacros")) # ln -s $(pwd)/rpmmacros ~/.rpmmacros
+assert os.path.isfile(os.path.expanduser("~/.config/wine-osx-key.pem"))
 
 def try_mkdir_p(path):
     try:
@@ -334,6 +336,28 @@ def publish(local_path, repository, signkey):
             checksums = {}
             for f in packages_macosx:
                 shutil.copy(os.path.join(local_path, f), temppath)
+
+                if f.endswith(".pkg"):
+                    digestinfo = os.path.join(temppath, "digestinfo.dat")
+                    signature  = os.path.join(temppath, "signature.dat")
+
+                    subprocess.check_call(["xar", "--sign", "-f", os.path.join(temppath, f),
+                                           "--digestinfo-to-sign", digestinfo,
+                                           "--sig-size", "256",
+                                           "--cert-loc", os.path.join(BUILDER_CERTS, "developerID_installer.cer"),
+                                           "--cert-loc", os.path.join(BUILDER_CERTS, "DeveloperIDCA.cer"),
+                                           "--cert-loc", os.path.join(BUILDER_CERTS, "AppleWWDRCA.cer")])
+
+                    subprocess.check_call(["openssl", "rsautl", "-sign",
+                                           "-inkey", os.path.expanduser("~/.config/wine-osx-key.pem"),
+                                           "-in", digestinfo, "-out", signature])
+
+                    subprocess.check_call(["xar", "--inject-sig", signature,
+                                           "-f", os.path.join(temppath, f)])
+
+                    os.remove(digestinfo)
+                    os.remove(signature)
+
                 subprocess.check_call(["gpg", "--detach-sign", "-u", signkey,
                                        "--no-armor", os.path.join(temppath, f)])
                 checksums[f] = subprocess.check_output(["sha256sum", "--", f], cwd=temppath).split("  ", 1)[0]
