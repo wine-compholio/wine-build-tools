@@ -21,7 +21,7 @@
 
 set -eux
 
-VERSION="1.9.0"
+VERSION="1.9.16"
 RELEASE=""
 
 mkdir -p "repository/raw/macosx-wine-staging"
@@ -61,7 +61,7 @@ for codename in 5 4; do
 	done
 done
 
-for codename in 22 23; do
+for codename in 22 23 24; do
 	mkdir -p "repository/raw/fedora-$codename-staging"
 	for arch in x86 x64; do
 

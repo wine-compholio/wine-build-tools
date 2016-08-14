@@ -163,6 +163,20 @@ BUILDER_SETTINGS = {
         "build_group":  "builder",
     },
 
+    # Fedora 24
+    "fedora-24-x86": {
+        'partition': "/dev/fedora/root",
+        'log_tty'  : "/dev/ttyS1",
+        'build_user':   "builder",
+        "build_group":  "builder",
+    },
+    "fedora-24-x64": {
+        'partition': "/dev/fedora/root",
+        'log_tty'  : "/dev/ttyS1",
+        'build_user':   "builder",
+        "build_group":  "builder",
+    },
+
     # XUbuntu 14.04 with graphical environment
     "xubuntu-14.04-x86-gui": {
         'partition': 0,
@@ -556,6 +570,12 @@ class BuildJob(object):
 
         else:
             raise NotImplementedError("System is using a non-supported init mechanism")
+
+        # Disable SELinux (required on Fedora 24)
+        if self.fs_exists("/etc/selinux/config"):
+            config = self.fs_download_content("/etc/selinux/config")
+            config = re.sub("^SELINUX *=.*$", "SELINUX=disabled", config, flags=re.MULTILINE)
+            self.fs_upload_content("/etc/selinux/config", config)
 
         # Upload wrapper script and make executable
         with open(os.path.join(BUILDER_ROOT, "wrapper.sh"), 'rb') as fp:

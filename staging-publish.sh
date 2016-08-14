@@ -21,7 +21,7 @@
 
 set -eux
 
-VERSION="1.9.0"
+VERSION="1.9.16"
 RELEASE=""
 
 repo_path="repository/raw/macosx-wine-staging/$VERSION$RELEASE-x86"
@@ -49,7 +49,7 @@ for codename in 5 4; do
 	done
 done
 
-for codename in 22 23; do
+for codename in 22 23 24; do
 	for arch in x86 x64; do
 
 		repo_path="repository/raw/fedora-$codename-staging/$VERSION$RELEASE-$arch"
